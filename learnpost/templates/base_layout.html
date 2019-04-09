@@ -1,4 +1,6 @@
 {% load static from staticfiles %}
+{% load socialaccount %}
+
 <!DOCTYPE HTML>
 <html lang="en">
 
@@ -76,11 +78,14 @@
 			{% if user.is_authenticated %}
 				<ul class="accounts-menu visible-on-click" id="accounts-menu">
 					<li><a href="{% url 'post-create' %}"><i class="mr-2 ion-plus"></i>New Post</a></li>
-					<li><a href="{% url 'profile' %}">{{ user.username }}</a></li>
+					<li><a  href="{% url 'profile' %}">{{ user.username }}</a></li>
 					<li><a href="{% url 'logout' %}"><i class="mr-2 ion-log-out"></i>Logout</a></li>
 				</ul><!-- main-menu -->
 			{% else %}
 				<ul class="accounts-menu visible-on-click" id="accounts-menu">
+					<li><a href="{% provider_login_url 'facebook' method='js_sdk' %}"class="btn btn-block btn-social btn-facebook" style="background-color:#3b5998; color:white; text-align:center">
+							<span class="fa fa-facebook"></span>
+										 Login in with Facebook</a></li>
 					<li><a href="{% url 'login' %}"><i class="mr-2 ion-log-in"></i>Login</a></li>
 					<li><a href="{% url 'register' %}"><i class="mr-2 ion-android-create"></i>SignUp</a></li>
 				</ul><!-- main-menu -->
@@ -157,6 +162,7 @@
 
 						<a class="logo" href="{% url 'blog-home' %}"><img src="{% static 'images/logo_red.png' %}"
 								alt="Logo Image"></a>
+						<a id="username" hidden data-username="{{user.username}}"></a> 
 						<p class="copyright">learnpost @ {{ date }}. All rights reserved.</p>
 						<p class="copyright">Designed by <a href="https://colorlib.com" target="_blank">Colorlib</a></p>
 						<ul class="icons">
@@ -195,6 +201,7 @@
 								<input class="email-input" type="text" placeholder="Enter your email">
 								<button class="submit-btn" type="submit"><i
 										class="icon ion-ios-email-outline"></i></button>
+										
 							</form>
 						</div>
 
@@ -229,10 +236,104 @@
 
 	{% block jquery %}  
 	{% endblock jquery %}
-	
+	{% providers_media_js %}
 	<script src="{% static 'common-js/scripts.js' %}"></script>
-	
-	
+	{% block facebookjs %}
+	  <script>
+		  console.log($('#username').attr("data-username"));
+			// This is called with the results from from FB.getLoginStatus().
+			function statusChangeCallback(response) {
+			  console.log('statusChangeCallback');
+			  console.log(response);
+			  // The response object is returned with a status field that lets the
+			  // app know the current login status of the person.
+			  // Full docs on the response object can be found in the documentation
+			  // for FB.getLoginStatus().
+			  if (response.status === 'connected') {
+				// Logged into your app and Facebook.
+				testAPI();
+			  } else {
+				// The person is not logged into your app or we are unable to tell.
+				document.getElementById('status').innerHTML = 'Please log ' +
+				  'into this app.';
+			  }
+			}
+		  
+			// This function is called when someone finishes with the Login
+			// Button.  See the onlogin handler attached to it in the sample
+			// code below.
+			function checkLoginState() {
+			  FB.getLoginStatus(function(response) {
+				statusChangeCallback(response);
+			  });
+			}
+		  
+			window.fbAsyncInit = function() {
+				FB.init({
+					appId      : '2568201606542522',
+					xfbml      : true,
+					version    : 'v3.2'
+				});
+		  
+			  // Now that we've initialized the JavaScript SDK, we call 
+			  // FB.getLoginStatus().  This function gets the state of the
+			  // person visiting this page and can return one of three states to
+			  // the callback you provide.  They can be:
+			  //
+			  // 1. Logged into your app ('connected')
+			  // 2. Logged into Facebook, but not your app ('not_authorized')
+			  // 3. Not logged into Facebook and can't tell if they are logged into
+			  //    your app or not.
+			  //
+			  // These three cases are handled in the callback function.
+		  
+			  FB.getLoginStatus(function(response) {
+				statusChangeCallback(response);
+			  });
+			};
+		  
+			// Load the SDK asynchronously
+			(function(d, s, id) {
+			  var js, fjs = d.getElementsByTagName(s)[0];
+			  console.log(s);
+			  if (d.getElementById(id)) return;
+			  js = d.createElement(s); js.id = id;
+			  js.src = "https://connect.facebook.net/en_US/sdk.js";
+			  fjs.parentNode.insertBefore(js, fjs);
+			}(document, 'script', 'facebook-jssdk'));
+		  
+			// Here we run a very simple test of the Graph API after login is
+			// successful.  See statusChangeCallback() for when this call is made.
+			function testAPI() {
+			  console.log('Welcome!  Fetching your information.... ');
+			 
+			  FB.api('/me', function(response) {
+				console.log('Successful login for: ' + response.name);
+				console.log(response);
+				document.getElementById('status').innerHTML =
+				  'Thanks for logging in, ' + response.name + '!';
+			  });
+			 
+			
+			}
+			setTimeout(()=>{
+				console.log('--------',$('#username').attr("data-username"));
+				$.ajax({
+					url: "{% url 'login_api' %}",
+					method: "POST",
+					data: {
+						"username": $('#username').attr("data-username"),
+						"password": ''
+					},
+					success: function(data) {
+					console.log(data['token']);
+					localStorage.setItem('token',data['token']);
+					}
+				});
+			},3000);
+			
+		  </script>
+		{% endblock facebookjs %}
 </body>
 
 </html>

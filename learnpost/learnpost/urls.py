@@ -29,6 +29,8 @@ urlpatterns = [
     path('api/login/', user_views.login_api, name="login_api"),
     path('login/', auth_views.LoginView.as_view(template_name='users/login.html'), name="login"),
     path('logout/', auth_views.LogoutView.as_view(template_name='users/logout.html'), name="logout"),
+    # urls - for login with facebook
+    path('accounts/', include('allauth.urls')),
 ]
 
 if settings.DEBUG:
