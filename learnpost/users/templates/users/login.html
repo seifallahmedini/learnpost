@@ -1,0 +1,56 @@
+{% extends "base_layout.html" %}
+{% load static from staticfiles %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="col-lg-8 col-md-12">
+    <div class="post-wrapper">
+
+        <h3 class="title"><b>Login to learnpost in order to share your knowledge with others </b></h3>
+
+        <div class="content-section">
+            <form action="" method="POST">
+                {% csrf_token %}
+                <fieldset class="form-group">
+                    <legend class="border-bottom mb-4">Login Now</legend>
+                    {{ form | crispy }}
+                </fieldset>
+
+                <div class="from-group" >
+                    <button class="mb-3 signup-btn" type="submit">Sign In</button>
+                </div>
+            </form>
+            <div>
+                <small class="text-muted">
+                    Need An Account? <a  class="ml-2" href="{% url 'register' %}">Sign Up</a>
+
+                </small>
+            </div>
+        </div>
+
+
+    </div><!-- post-wrapper -->
+</div><!-- col-sm-8 col-sm-offset-2 -->
+
+{% endblock %}
+{% block jquery %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.signup-btn').click(function(){
+                $.ajax({
+                    url: "{% url 'login_api' %}",
+                    method: "POST",
+                    data: {
+                      "username": $('#id_username').val(),
+                      "password": $('#id_password').val()
+                    },
+                    success: function(data) {
+                      console.log(data['token']);
+                      localStorage.setItem('token',data['token']);
+                    }
+                });
+            });
+        });
+       
+    </script>
+{% endblock %}

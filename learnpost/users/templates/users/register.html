@@ -1,0 +1,35 @@
+{% extends "base_layout.html" %}
+{% load static from staticfiles %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="col-lg-8 col-md-12">
+    <div class="post-wrapper">
+
+        <h3 class="title"><b>Register in learnpost in order to share your knowledge with others </b></h3>
+
+        <div class="content-section">
+            <form action="" method="POST">
+                {% csrf_token %}
+                <fieldset class="form-group">
+                    <legend class="border-bottom mb-4">Join Today</legend>
+                    {{ form | crispy }}
+                </fieldset>
+
+                <div class="from-group" >
+                    <button class="mb-3 signup-btn" type="submit">Sign Up</button>
+                </div>
+            </form>
+            <div>
+                <small class="text-muted">
+                    Already Have An Account? <a  class="ml-2" href="{% url 'login' %}">Sign In Now</a>
+
+                </small>
+            </div>
+        </div>
+
+
+    </div><!-- post-wrapper -->
+</div><!-- col-sm-8 col-sm-offset-2 -->
+
+{% endblock %}

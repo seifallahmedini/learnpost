@@ -1,0 +1,403 @@
+{% extends "base_layoutv2.html" %}
+{% load static from staticfiles %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<section class="post-area section">
+	<div class="container">
+
+		<div class="row">
+
+			<div class="col-lg-8 col-md-12 no-right-padding">
+
+				<div class="main-post">
+
+					<div class="blog-post-inner">
+
+						<div class="post-info">
+
+							<div class="left-area">
+								<a class="avatar" href="#"><img src="{{ object.author.profile.image.url }}"
+										alt="Profile Image"></a>
+							</div>
+
+							<div class="middle-area">
+								<a class="name"
+									href="{% url 'user-posts' post.author.username %}"><b>{{ object.author }}</b></a>
+								<h6 class="date">on {{ object.date_posted | date }} at {{ object.date_posted.time }}
+								</h6>
+							</div>
+							{% if user == post.author %}
+							<div class="right-area">
+								<ul class="tags">
+									<li><a href="{% url 'post-update' post.id %}">Update</a></li>
+									<li><a id="red-style" href="{% url 'post-delete' post.id %}">Delete</a></li>
+								</ul>
+
+							</div>
+							{% endif %}
+						</div><!-- post-info -->
+
+						<h3 class="title"><b>{{ object.title }}</b></h3>
+
+						<p class="para">{{object.content}}</p>
+
+						<div class="post-image"><img src="{{ object.image.url }}" alt="Blog Image"></div>
+
+						<h4 class="title para"><a href="#"><b>{{ object.main_question }}</b></a></h4>
+
+						<ul class="tags">
+							<li><a href="#">Mnual</a></li>
+							<li><a href="#">Liberty</a></li>
+							<li><a href="#">Recommendation</a></li>
+							<li><a href="#">Inspiration</a></li>
+						</ul>
+					</div><!-- blog-post-inner -->
+
+					<div class="post-icons-area">
+						<ul class="post-icons">
+							{% if user.is_authenticated %}
+								<li><a class="like-btn" data-href="{{ post.get_api_like_url }}" href='{{ post.get_api_like_url }}'><i class="ion-heart"></i>{{ post.likes.count }}</a></li>
+							{% else %}
+								<li><a href="{% url 'login' %}"><i class="ion-heart"></i>{{ post.likes.count }}</a></li>
+							{% endif %}
+							<li class="comment_num"><a href="#"><i class="ion-chatbubble"></i>{{ object.comment_set.count }}</a></li>
+							<li><a href="#"><i class="ion-eye"></i>138</a></li>
+						</ul>
+
+						<ul class="icons">
+							<li>SHARE : </li>
+							<li><a href="#"><i class="ion-social-facebook"></i></a></li>
+							<li><a href="#"><i class="ion-social-twitter"></i></a></li>
+							<li><a href="#"><i class="ion-social-pinterest"></i></a></li>
+						</ul>
+					</div>
+
+
+				</div><!-- main-post -->
+			</div><!-- col-lg-8 col-md-12 -->
+
+			<div class="col-lg-4 col-md-12 no-left-padding">
+
+				<div class="single-post info-area">
+
+					<div class="sidebar-area about-area">
+						<h4 class="title"><b>ABOUT LEARNPOST</b></h4>
+						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+							ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur
+							Ut enim ad minim veniam</p>
+					</div>
+
+					<div class="sidebar-area subscribe-area">
+
+						<h4 class="title"><b>SUBSCRIBE</b></h4>
+						<div class="input-area">
+							<form>
+								<input class="email-input" type="text" placeholder="Enter your email">
+								<button class="submit-btn" type="submit"><i
+										class="icon ion-ios-email-outline"></i></button>
+							</form>
+						</div>
+
+					</div><!-- subscribe-area -->
+
+					<div class="tag-area">
+
+						<h4 class="title"><b>TAG CLOUD</b></h4>
+						<ul>
+							<li><a href="#">Manual</a></li>
+							<li><a href="#">Liberty</a></li>
+							<li><a href="#">Recomendation</a></li>
+							<li><a href="#">Interpritation</a></li>
+							<li><a href="#">Manual</a></li>
+							<li><a href="#">Liberty</a></li>
+							<li><a href="#">Recomendation</a></li>
+							<li><a href="#">Interpritation</a></li>
+						</ul>
+
+					</div><!-- subscribe-area -->
+
+				</div><!-- info-area -->
+
+			</div><!-- col-lg-4 col-md-12 -->
+
+		</div><!-- row -->
+
+	</div><!-- container -->
+</section><!-- post-area -->
+
+
+
+
+<section class="mt-5 comment-section">
+	<div class="container">
+		{% if user.is_authenticated %}
+		<h4><b>POST COMMENT</b></h4>
+		{% endif %}
+		<div class="row">
+
+			<div class="col-lg-8 col-md-12">
+				{% if user.is_authenticated %}
+				<div class="comment-form">
+					<form class="new-comment-form" method="post">
+						{% csrf_token %}
+						<div class="row">
+
+
+
+							<div class="col-sm-12">
+								<!-- <input id="id" name="id" type="hidden" value="{{ object.pk }}">
+								<textarea name="content" rows="2" id="content" class="text-area-messge form-control"
+									placeholder="Enter your comment" aria-required="true"
+									aria-invalid="false"></textarea> -->
+								<input id="id" name="id" type="hidden" value="{{ object.pk }}">
+								{{ form | crispy }}
+							</div><!-- col-sm-12 -->
+							<div class="col-sm-12">
+								<button class="submit-btn" type="submit" id="form-submit"><b>POST COMMENT</b></button>
+							</div><!-- col-sm-12 -->
+
+						</div><!-- row -->
+					</form>
+				</div><!-- comment-form -->
+				{% endif %}
+
+				<h4 class="comment_count"><b>COMMENTS({{ comment_list.count }})</b></h4>
+				{% for comment  in comment_list  %}
+				<div class="commnets-area">
+
+					<div class="comment">
+
+						<div class="post-info">
+
+							<div class="left-area">
+								<a class="avatar" href="#"><img src="{{ comment.author.profile.image.url }}"
+										alt="Profile Image"></a>
+							</div>
+
+							<div class="middle-area">
+								<a class="name" href="#"><b>{{ comment.author.username }}</b></a>
+								<h6 class="date">on Sep 29, 2017 at 9:48 am</h6>
+							</div>
+
+							<div class="right-area">
+								<h5 class="reply-btn"><a href="#"><b>REPLY</b></a></h5>
+							</div>
+
+						</div><!-- post-info -->
+
+						<p>{{ comment.content }}</p>
+
+					</div>
+
+
+				</div><!-- commnets-area -->
+				{% endfor %}
+				<div class="ajoute"></div>
+				<div class="commnets-area ">
+
+					<div class="comment">
+
+						<div class="post-info">
+
+							<div class="left-area">
+								<a class="avatar" href="#"><img src="images/avatar-1-120x120.jpg"
+										alt="Profile Image"></a>
+							</div>
+
+							<div class="middle-area">
+								<a class="name" href="#"><b>Katy Liu</b></a>
+								<h6 class="date">on Sep 29, 2017 at 9:48 am</h6>
+							</div>
+
+							<div class="right-area">
+								<h5 class="reply-btn"><a href="#"><b>REPLY</b></a></h5>
+							</div>
+
+						</div><!-- post-info -->
+
+						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+							ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur
+							Ut enim ad minim veniam</p>
+
+					</div>
+					<div class="comment">
+						<h5 class="reply-for">Reply for <a href="#"><b>Katy Lui</b></a></h5>
+
+						<div class="post-info">
+
+							<div class="left-area">
+								<a class="avatar" href="#"><img src="images/avatar-1-120x120.jpg"
+										alt="Profile Image"></a>
+							</div>
+
+							<div class="middle-area">
+								<a class="name" href="#"><b>Katy Liu</b></a>
+								<h6 class="date">on Sep 29, 2017 at 9:48 am</h6>
+							</div>
+
+							<div class="right-area">
+								<h5 class="reply-btn"><a href="#"><b>REPLY</b></a></h5>
+							</div>
+
+						</div><!-- post-info -->
+
+						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+							ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur
+							Ut enim ad minim veniam</p>
+
+					</div>
+
+				</div><!-- commnets-area -->
+
+				<a class="more-comment-btn" href="#"><b>VIEW MORE COMMENTS</a>
+
+			</div><!-- col-lg-8 col-md-12 -->
+
+		</div><!-- row -->
+
+	</div><!-- container -->
+</section>
+
+
+
+
+
+{% endblock %}
+{% block jquery %}
+<script type="text/javascript">
+		console.log("token in the local storage",localStorage.getItem('token'));
+			
+			$(".like-btn").click(function(event) {
+			  event.preventDefault();
+			  var this_ = $(this);
+			  var likeUrl = this_.attr("data-href");
+			  var likeCount = parseInt(this_.attr("data-likes"));
+			  console.log(likeUrl);
+			  $.ajax({
+				url: likeUrl,
+				method: "GET",
+				headers: {"Authorization": 'Token '+localStorage.getItem('token')},
+				data: {},
+				success: function(data) {
+					console.log(data['count']);
+					$('.like-btn').replaceWith(function(){
+						return $(this).html("<i class='ion-heart'></i>"+data['count']);
+						/*$("<a class='like-btn' data-href='{{ post.get_api_like_url }}'  href='{{ post.get_api_like_url }}'><i class='ion-heart'></i>"+data['count']+"</a>", {
+							html: $(this).html()
+						});*/
+						//$(this).html("<a class='like-btn' data-href="+likeUrl+"  href="+likeUrl+"><i class='ion-heart'></i> "+data['count']+"</a>");
+					});
+					//$('.like-btn').html("<a class='like-btn' data-href="+likeUrl+"  href="+likeUrl+"><i class='ion-heart'></i> "+data['count']+"</a>");
+					
+				},
+				error: function(error) {
+				  console.log(error);
+				}
+			  });
+			});
+
+		
+	  </script>
+{% endblock jquery %}
+{% block commentjs %}
+<script type="text/javascript">
+
+	$(document).ready(function(){
+		var $myForm = $('.new-comment-form');
+		$myForm.submit(function(event) {
+			event.preventDefault();
+			var $formData = $myForm.serialize();
+			console.log($formData);
+			$.ajax({
+				type: 'POST',
+				url: "{% url 'add-comment' %}",
+				data:  $formData,
+				success: handleSuccess,
+				error: handleError,
+			});
+			function handleSuccess(data) {
+				//console.log(data['comment_list']);
+				//comments = data['comment_list'];
+				$post_id = data['post_id'];
+				$comment_id = data['comment_id'];
+				$.ajax({
+					type: 'get',
+					url: "{% url 'comment-list' %}",
+					data: {post_id: $post_id,comment_id: $comment_id},
+					dataType:  'json',
+					success: function(data) {
+						console.log(data);
+						comments = data['comment_list'];
+						comment_count = data['comment_count'];
+						//console.log(comment_count);
+						let rows =  '';
+						$('.comment_count').replaceWith(function(){
+							console.log(comment_count);
+							return $("<h4 class='comment_count'><b>COMMENTS("+comment_count+")</b></h4>", {html: $(this).html()});
+						});
+						$('.comment_num').replaceWith(function(){
+							return $("<li class='comment_num'><a href='#'><i class='ion-chatbubble'></i>"+comment_count+"</a></li>", {html: $(this).html()});
+						});
+						//$('.ajoute').html('');
+						comments.forEach(comment => {
+							rows += `
+							<div class="commnets-area">
+								<div class="comment">
+									<div class="post-info">
+										<div class="left-area">
+											<a class="avatar" href="#"><img src="${ comment.on_post }" 
+													alt="Profile Image"></a>
+										</div>
+
+										<div class="middle-area">
+											<a class="name" href="#"><b>${ comment.author}</b></a>
+											<h6 class="date">on Sep 29, 2017 at 9:48 am</h6>
+										</div>
+
+										<div class="right-area">
+											<h5 class="reply-btn"><a href="#"><b>REPLY</b></a></h5>
+										</div>
+
+									</div><!-- post-info -->
+
+									<p>${ comment.content }</p>
+
+								</div>
+							</div>`;
+						});
+						$('.ajoute').append(rows);
+					},
+					error: function(error) {
+						console.log(error);
+					},
+				});
+				
+				
+			}
+			function handleError(data) {
+				
+			}
+		});
+		/*$(document).on('submit', '#new-comment-form', function (e) {
+			// prevent the page from getting refreshed
+			//e.preventDefault();
+			var content = $('#content').val();
+			var id = $('#id').val();
+	
+			$.ajax({
+				type: 'POST',
+				url: "{% url 'add-comment' %}",
+				data: {
+					content: content,
+					id: id
+				},
+				success: function () {
+	
+				}
+			});
+		});*/
+	});
+	
+</script>
+{% endblock commentjs %}
